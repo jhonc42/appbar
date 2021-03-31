@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:miappbar/src/helpers/helpers.dart';
+import 'package:miappbar/src/models/audioplayer.dart';
 import 'package:miappbar/src/widgets/custom_appbar.dart';
+import 'package:provider/provider.dart';
 
 class MusicPlayerPage extends StatelessWidget {
   @override
@@ -67,7 +72,54 @@ class Lyrics extends StatelessWidget {
   }
 }
 
-class PlayTitle extends StatelessWidget {
+// Esto se genera a partir de cuando se convirtió el statelessWidget a un StateFullWidget el PlayTitleState
+class PlayTitle extends StatefulWidget {
+  @override
+  _PlayTitleState createState() => _PlayTitleState();
+}
+
+// El with SingleTickerProvider.... es necesario para que no le salga error al momento de inicializar el controlador en el initState pasandole el argumento this.
+//
+class _PlayTitleState extends State<PlayTitle>
+    with SingleTickerProviderStateMixin {
+  bool isPlaying = false;
+  AnimationController playAnimation;
+  bool firstTime = true;
+
+  final assetAudioPlayer = new AssetsAudioPlayer();
+
+  @override
+  void initState() {
+    // es mejor inicializar el controlador aqui en el initState, acordarse que lo que hace es instanciar esa clase AnimationController pero el new ya está implicito en dart:
+    playAnimation =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    super.initState();
+  }
+
+  // SIEMPRE QUE TENGA UN CONTROLADOR ACOSTUMBRARSE A IMPLEMENTAR EL DISPOSE COMO BUENA PRÁCTICA.
+  @override
+  void dispose() {
+    // AQUI SE LIBERA EL CONTROLADOR PLAYANIMATION CON EL DISPOSE COMO BUENA PRÁCTICA.
+    this.playAnimation.dispose();
+    super.dispose();
+  }
+
+  void open() {
+    final audioPlayerModel =
+        // el listen en false en este caso es porque no se va a necesitar que actualice widgets en la vista.
+        Provider.of<AudioPlayerModel>(context, listen: false);
+    assetAudioPlayer.open(Audio('assets/Breaking-Benjamin-Far-Away.mp3'));
+    // el currentPosition del assetAudioPlayer (package que hemos instalado) es un stream, por lo cual con el listen ud va escuchando en donde va la canción
+    // el duration que recibe el listen del Stream es de tipo Duration.
+    assetAudioPlayer.currentPosition.listen((duration) {
+      audioPlayerModel.current = duration;
+    });
+    // en lo siguiente se hace referencia a current como la canción actual, arriba era el currentPosition
+    assetAudioPlayer.current.listen((playingAudio) {
+      audioPlayerModel.songDuration = playingAudio.audio.duration;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -89,9 +141,32 @@ class PlayTitle extends StatelessWidget {
             Spacer(),
             FloatingActionButton(
               backgroundColor: Color(0xffF8CB51),
-              child: Icon(Icons.play_arrow),
+              // child: Icon(Icons.play_arrow),
+              child: AnimatedIcon(
+                icon: AnimatedIcons.play_pause,
+                progress: playAnimation,
+              ),
               onPressed: () {
-                // TODO Botón
+                // OJO: se coloca el listen en false despues del context porque está dentro de un onPresed y esto es una condición del cuando se usa provider como manejador de estado de la app.
+                final audioPlayerModel =
+                    Provider.of<AudioPlayerModel>(context, listen: false);
+                // Acá se dispara la animación del botón ya sea a play o a pausa con el forward y reverse. Dependiendo de si está reproduciendo o no con la variables isPlaying
+                if (this.isPlaying) {
+                  playAnimation.reverse();
+                  this.isPlaying = false;
+                  audioPlayerModel.controller.stop();
+                } else {
+                  playAnimation.forward();
+                  this.isPlaying = true;
+                  audioPlayerModel.controller.repeat();
+                }
+
+                if (firstTime) {
+                  this.open();
+                  firstTime = false;
+                } else {
+                  assetAudioPlayer.playOrPause();
+                }
               },
             )
           ],
@@ -125,10 +200,14 @@ class ProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = TextStyle(color: Colors.white.withOpacity(0.4));
+
+    final audioPlayerModel = Provider.of<AudioPlayerModel>(context);
+    final percentage = audioPlayerModel.percentage;
+
     return Container(
         child: Column(
       children: <Widget>[
-        Text('00:00', style: style),
+        Text('${audioPlayerModel.songTotalDuration}', style: style),
         SizedBox(height: 10),
         Stack(
           children: <Widget>[
@@ -138,12 +217,14 @@ class ProgressBar extends StatelessWidget {
             Positioned(
               bottom: 0,
               child: Container(
-                  width: 3, height: 50, color: Colors.white.withOpacity(0.8)),
+                  width: 3,
+                  height: 120 * percentage,
+                  color: Colors.white.withOpacity(0.8)),
             )
           ],
         ),
         SizedBox(height: 10),
-        Text('00:00', style: style)
+        Text('${audioPlayerModel.currentSecond}', style: style)
       ],
     ));
   }
@@ -152,6 +233,7 @@ class ProgressBar extends StatelessWidget {
 class DiscImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final audioPlayerModel = Provider.of<AudioPlayerModel>(context);
     return Container(
       padding: EdgeInsets.all(20),
       width: 200,
@@ -160,8 +242,15 @@ class DiscImage extends StatelessWidget {
           borderRadius: BorderRadius.circular(200),
           child: Stack(
             alignment: Alignment.center,
-            children: [
-              Image(image: AssetImage('assets/aurora.jpg')),
+            children: <Widget>[
+              SpinPerfect(
+                  duration: Duration(seconds: 10),
+                  animate: false,
+                  infinite: true,
+                  manualTrigger: true,
+                  controller: (animationController) =>
+                      audioPlayerModel.controller = animationController,
+                  child: Image(image: AssetImage('assets/aurora.jpg'))),
               Container(
                 width: 25,
                 height: 25,

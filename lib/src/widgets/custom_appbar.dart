@@ -10,7 +10,13 @@ class CustomAppBar extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Row(
           children: <Widget>[
-            Icon(FontAwesomeIcons.chevronLeft),
+            IconButton(
+              icon: Icon(FontAwesomeIcons.chevronLeft),
+              onPressed: () {
+                // close(context, null);
+                Navigator.pushNamed(context, '/');
+              },
+            ),
             Spacer(),
             Icon(FontAwesomeIcons.commentAlt),
             SizedBox(width: 20),

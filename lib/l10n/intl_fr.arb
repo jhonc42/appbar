@@ -1,0 +1,21 @@
+{
+  "@@last_modified": "2021-04-06T19:51:28.861813",
+  "title": "App Le Bar",
+  "@title": {
+    "description": "App title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "welcome_label": "Bienvenue",
+  "@welcome_label": {
+    "description": "Welcome message",
+    "type": "text",
+    "placeholders": {}
+  },
+  "choosesong_hint": "Rechercher une chanson",
+  "@choosesong_hint": {
+    "description": "Choose song",
+    "type": "text",
+    "placeholders": {}
+  }
+}

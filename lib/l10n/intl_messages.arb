@@ -1,0 +1,21 @@
+{
+  "@@last_modified": "2021-04-06T19:51:28.861813",
+  "title": "App Bar",
+  "@title": {
+    "description": "App title",
+    "type": "text",
+    "placeholders": {}
+  },
+  "welcome_label": "Welcome",
+  "@welcome_label": {
+    "description": "Welcome message",
+    "type": "text",
+    "placeholders": {}
+  },
+  "choosesong_hint": "Choose Song",
+  "@choosesong_hint": {
+    "description": "Choose song",
+    "type": "text",
+    "placeholders": {}
+  }
+}

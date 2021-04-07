@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:miappbar/src/helpers/myLocalizations.dart';
 import 'package:miappbar/src/models/audioplayer.dart';
 
 import 'package:miappbar/src/theme/theme.dart';
@@ -17,10 +20,24 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => new AudioPlayerModel())
       ],
       child: MaterialApp(
+        onGenerateTitle: (BuildContext context) =>
+            MyLocalizations.of(context).title,
         debugShowCheckedModeBanner: false,
-        title: 'App Bar',
+        // title: MyLocalizations.of(context).title,
         theme: myTheme,
+
         // home: InitPlayerPage()
+        localizationsDelegates: [
+          const MyLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('en', ''),
+          const Locale('es', ''),
+          const Locale('fr', ''),
+        ],
         initialRoute: '/',
         routes: {
           '/': (BuildContext context) => InitPlayerPage(),

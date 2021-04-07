@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:miappbar/src/helpers/myLocalizations.dart';
 
 import 'package:miappbar/src/search/search_delegate.dart';
 
@@ -8,7 +9,7 @@ class InitPlayerPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text('Buscar y pedir canción',
+        title: Text(MyLocalizations.of(context).choosesong_hint,
             style: TextStyle(
                 fontStyle: FontStyle.italic,
                 color: Colors.white.withOpacity(0.6),
@@ -26,7 +27,7 @@ class InitPlayerPage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Text('Hola Mundo'),
+        child: Text(MyLocalizations.of(context).welcome_label),
       ),
     );
   }

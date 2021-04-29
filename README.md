@@ -1,6 +1,6 @@
 # miapp
 
-A new Project with Flutter.
+A new music player Project with Flutter.
 Proyecto de prueba.
 
 ## Getting Started

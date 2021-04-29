@@ -1,7 +1,7 @@
-# miappbar
+# miapp
 
-A new Bar Project with Flutter.
-Proyecto bar de prueba.
+A new Project with Flutter.
+Proyecto de prueba.
 
 ## Getting Started
 
